@@ -11,6 +11,8 @@ app.use(cors());
 
 const upload = multer();
 
+const SALUDO_FINAL = "\n\nBuen Trabajo. Saludos.";
+
 // app.post("/evaluate", upload.single("file"), async (req, res) => {
 //   try {
 //     if (!req.file) {
@@ -66,12 +68,12 @@ app.post("/evaluate", upload.single("file"), async (req, res) => {
         });
     }
 
-    const feedback = await generateFeedback(
+    const feedbackIA = await generateFeedback(
       req.body.consigna || "Análisis de decreto con IA",
       trimmed
     );
 
-    res.json({ feedback });
+    res.json({ feedback: `${feedbackIA}${SALUDO_FINAL}` });
 
   } catch (error: any) {
   console.error(error);
@@ -84,7 +86,7 @@ app.post("/evaluate", upload.single("file"), async (req, res) => {
   ) {
      // 🔥 fallback inteligente
 
-  const random = templates[Math.floor(Math.random() * templates.length)];
+  const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
   const lowerText = trimmed.toLowerCase();
 
   let extra = "";
@@ -102,7 +104,7 @@ app.post("/evaluate", upload.single("file"), async (req, res) => {
   }
 
   return res.json({
-    feedback: random + extra
+    feedback: `${randomTemplate}${extra}${SALUDO_FINAL}`
   });
 }
 
