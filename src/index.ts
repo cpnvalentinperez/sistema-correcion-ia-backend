@@ -7,11 +7,36 @@ import { parseFile } from "././services/fileParser";
 import { generateFeedback } from "./services/aiService";
 
 const app = express();
-app.use(cors());
+app.disable("x-powered-by");
 
-const upload = multer();
+app.use(cors({
+  origin: [
+    "https://TUAPP.netlify.app"
+  ],
+  methods: ["POST"],
+}));
+
+const upload = multer({
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowed = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Formato no permitido"));
+    }
+  },
+});
 
 const SALUDO_FINAL = "\n\nBuen Trabajo. Saludos.";
+
+const PORT = process.env.PORT || 3001;
 
 // app.post("/evaluate", upload.single("file"), async (req, res) => {
 //   try {
@@ -114,7 +139,21 @@ app.post("/evaluate", upload.single("file"), async (req, res) => {
 }
 });
 
-app.listen(3001, () => {
-  console.log("API running on port 3001");
+app.use((err: any, _req: any, res: any, _next: any) => {
+  console.error(err);
+
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({
+      error: "El archivo excede el tamaño permitido",
+    });
+  }
+
+  res.status(500).json({
+    error: err.message || "Error interno",
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`API running on port ${PORT}`);
 });
 
