@@ -15,7 +15,6 @@ const allowedOrigins = [
   process.env.FRONTEND_URL!,
 ];
 
-
 app.use(cors({
   origin: (origin, callback) => {
     // permite Postman/server-to-server requests
@@ -27,10 +26,13 @@ app.use(cors({
       return callback(null, true);
     }
 
+    console.error("Blocked by CORS:", origin);
+
     return callback(new Error("CORS no permitido"));
   },
-  methods: ["POST"],
+    methods: ["GET", "POST"],
 }));
+
 const upload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024,
