@@ -9,13 +9,28 @@ import { generateFeedback } from "./services/aiService";
 const app = express();
 app.disable("x-powered-by");
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://celadon-tulumba-ebc775.netlify.app",
+];
+
+
 app.use(cors({
-  origin: [
-    "https://TUAPP.netlify.app"
-  ],
+  origin: (origin, callback) => {
+    // permite Postman/server-to-server requests
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("CORS no permitido"));
+  },
   methods: ["POST"],
 }));
-
 const upload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024,
