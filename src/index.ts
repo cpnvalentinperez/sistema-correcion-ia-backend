@@ -12,7 +12,7 @@ app.disable("x-powered-by");
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
-  "https://celadon-tulumba-ebc775.netlify.app",
+  process.env.FRONTEND_URL!,
 ];
 
 
